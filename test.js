@@ -1,11 +1,19 @@
-var key = Uint8Array.from([
+var key = [
   0x54, 0x68, 0x61, 0x74, 0x73, 0x20, 0x6D, 0x79, 0x20, 0x4B, 0x75, 0x6E, 0x67, 0x20, 0x46, 0x75
-]).buffer;
+];
+var key_arraybuffer = Uint8Array.from(key).buffer;
 
-var plain = Uint8Array.from([
+var plain = [
   0x54, 0x77, 0x6F, 0x20, 0x4F, 0x6E, 0x65, 0x20, 0x4E, 0x69, 0x6E, 0x65, 0x20, 0x54, 0x77, 0x6F
-]).buffer;
-var plain_view8 = new Uint8Array(plain);
+];
+var i, j;
+for(i=0; i<5000; ++i){
+  var str = 'Beautiful Cindy!';
+  for(j=0; j<16; ++j)
+    plain.push(str.charCodeAt(j));
+}
+var plain_arraybuffer = Uint8Array.from(plain).buffer;
+var plain_view8 = new Uint8Array(plain_arraybuffer);
 
 var dump = function(buffer){
   if( buffer instanceof ArrayBuffer )
@@ -24,10 +32,29 @@ var dump = function(buffer){
   console.log(out);
 };
 
-var scheduled_key = key_schedule(key);
+var test = function(methodGen, key, plain, cipher, replain){
+  var begin_time = (new Date).getTime();
+  var method = methodGen();
+  var init_time = (new Date).getTime();
+  var scheduled_key = method.key_schedule(key);
+  var prepare_time = (new Date).getTime();
+  var offset;
+  var len = plain.length || plain.byteLength;
+  for(offset=0; offset<len; offset+=16){
+    method.encrypt_block(cipher, plain, offset, scheduled_key);
+    method.decrypt_block(replain, cipher, offset, scheduled_key);
+  }
+  var done_time = (new Date).getTime();
+  /*
+  dump(plain);
+  dump(cipher);
+  dump(replain);
+  */
+  console.log(init_time-begin_time, prepare_time-init_time, done_time-prepare_time);
+};
 
-dump(plain);
-var cipher = encrypt_block(plain, scheduled_key);
-dump(cipher);
-var replain = decrypt_block(cipher, scheduled_key);
-dump(replain);
+console.log('vanilla');
+test(vanillaMethod, key, plain, [], []);
+console.log('array_buffer');
+test(arraybufferMethod, key_arraybuffer, plain_arraybuffer, new ArrayBuffer(plain_arraybuffer.byteLength), new ArrayBuffer(plain_arraybuffer.byteLength));
+
