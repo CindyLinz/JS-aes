@@ -6,8 +6,10 @@ var key_arraybuffer = Uint8Array.from(key).buffer;
 var plain = [
   0x54, 0x77, 0x6F, 0x20, 0x4F, 0x6E, 0x65, 0x20, 0x4E, 0x69, 0x6E, 0x65, 0x20, 0x54, 0x77, 0x6F
 ];
-var i, j;
-for(i=0; i<5000; ++i){
+var i, j, n = 5000, match;
+if( match = (''+window.location).match(/n=(\d+)/) )
+  n = parseInt(match[1], 10);
+for(i=0; i<n; ++i){
   var str = 'Beautiful Cindy!';
   for(j=0; j<16; ++j)
     plain.push(str.charCodeAt(j));
@@ -25,9 +27,13 @@ var dump = function(buffer){
       out += '\n';
     else
       out += ' ';
-    if( buffer[i] < 16 )
-      out += '0';
-    out += buffer[i].toString(16);
+    if( buffer[i] ){
+      if( buffer[i] < 16 )
+        out += '0';
+      out += buffer[i].toString(16);
+    }
+    else
+      out += '00';
   }
   console.log(out);
 };
@@ -46,6 +52,7 @@ var test = function(methodGen, key, plain, cipher, replain){
   }
   var done_time = (new Date).getTime();
   /*
+  //dump(scheduled_key);
   dump(plain);
   dump(cipher);
   dump(replain);
@@ -54,7 +61,11 @@ var test = function(methodGen, key, plain, cipher, replain){
 };
 
 console.log('vanilla');
-test(vanillaMethod, key, plain, [], []);
+test(vanillaMethod, key, plain, new Array(plain.length), new Array(plain.length));
+
 console.log('array_buffer');
 test(arraybufferMethod, key_arraybuffer, plain_arraybuffer, new ArrayBuffer(plain_arraybuffer.byteLength), new ArrayBuffer(plain_arraybuffer.byteLength));
+
+console.log('asm');
+test(asmMethod, key, plain, new Array(plain.length), new Array(plain.length));
 
