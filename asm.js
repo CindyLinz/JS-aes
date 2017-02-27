@@ -223,14 +223,6 @@ function asmMethod(){
       key_schedule: key_schedule,
       encrypt_block: encrypt_block,
       decrypt_block: decrypt_block
-
-      , add_round_key: add_round_key
-      , sub_bytes: sub_bytes
-      , sub_bytes_inv: sub_bytes_inv
-      , shift_row: shift_row
-      , shift_row_inv: shift_row_inv
-      , mix_column: mix_column
-      , mix_column_inv: mix_column_inv
     };
   };
 
