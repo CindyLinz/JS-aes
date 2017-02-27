@@ -6,6 +6,13 @@
     <script src=asm.js></script>
   </head>
   <body>
+    <label>block number: <input type=number id=number value=5000></label><br>
+    <label><input type=radio name=key value=128 checked> AES-128</label>
+    <label><input type=radio name=key value=192> AES-192</label>
+    <label><input type=radio name=key value=256> AES-256</label><br>
+    <label><input type=checkbox id=show> show data</label><br>
+    <button id=go>Run</button>
+    <div id=result style='height:400px;border 1px solid #ccc'></div>
     <script src=test.js></script>
   </body>
 </html>
